@@ -1,8 +1,13 @@
 body{
-    font-family: 'Courier New', Courier, monospace;
-    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 #board{
+    display: flex;
     background-image: url('Images/flappybirdbg.png');
 }
