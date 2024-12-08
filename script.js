@@ -36,6 +36,14 @@ let gravity = 0.4;
 //Game
 let gameOver = false;
 let score = 0;
+if (localStorage.getItem("Score") !== null) {
+} else {
+    localStorage.setItem("Score", score)
+}
+let wingSound = new Audio("Sound/sfx_wing.wav");
+let hitSound = new Audio("Sound/sfx_hit.wav");
+let crossPipe = new Audio("Sound/sfx_point.wav");
+let birdDie = new Audio("Sound/sfx_die.wav");
 
 //Game on Load Function
 window.onload = function () {
@@ -67,6 +75,7 @@ window.onload = function () {
     }, 1500);
     document.addEventListener('keydown', moveBird)
     document.addEventListener('touchstart', () => {
+        wingSound.play();
         velocityY = -6;
         if (gameOver) {
             bird.y = birdY;
@@ -91,6 +100,7 @@ function update() {
     context.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
 
     if (bird.y > board.height) {
+        birdDie.play();
         gameOver = true;
     }
 
@@ -101,12 +111,14 @@ function update() {
         context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
         if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+            crossPipe.play();
             score += 0.5;
             pipe.passed = true;
         }
 
         if (detectCollision(bird, pipe)) {
             gameOver = true;
+            hitSound.play();
         }
     }
 
@@ -116,12 +128,19 @@ function update() {
     }
 
     //showing score
-    context.fillStyle = "white";
-    context.font = "45px sans-serif";
-    context.fillText(`Score: ${score}`, 5, 45);
+    context.font = "40px sans-serif";
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
 
-    if (gameOver) {
-        context.fillText("GAME OVER", 45, 300);
+    if (!gameOver) {
+        context.strokeText(score, 180, 60);
+    } else {
+        if (localStorage.getItem("Score") < score) {
+            localStorage.setItem("Score", score);
+        }
+        context.strokeText("GAME OVER", 55, 300);
+        context.strokeText(`Your Score:${score}`, 60, 100);
+        context.strokeText(`Highest Score:${localStorage.getItem("Score")}`, 30, 150);
     }
 }
 
@@ -157,6 +176,7 @@ function moveBird(e) {
     if (e.code == "Space" || e.code == "ArrowUp") {
         //Jump
         velocityY = -6;
+        wingSound.play();
         //reset game
         if (gameOver) {
             bird.y = birdY;
@@ -164,7 +184,6 @@ function moveBird(e) {
             score = 0;
             gameOver = false;
         }
-
     }
 }
 
